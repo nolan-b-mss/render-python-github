@@ -5,22 +5,27 @@ from flask import Flask, request
 # The Flask application object must be available at the top level
 app = Flask(__name__) 
 MAGIC_WORD = 'fred'
+magic_word_count = 0
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # Default message when first loading the page (GET request)
-    result = "<span style='color:red'> Try the magic word 'fred'</span>"
+    global magic_word_count  # 🔑 FIX 1: Declares intent to modify the global variable
+    
+    # Initial message for GET request or failure case
+    result = f"<span style='color:red'> Try the magic word 'fred'. Total count: {magic_word_count}</span>"
     
     # Logic for handling form submission (POST request)
     if request.method == 'POST':
-        # Get the input text from the form data
         my_input = request.form.get('myText01')
         
         if my_input == MAGIC_WORD:
-            result = "<b style='color:green'> Thats correct! </b>"
+            magic_word_count += 1
+            
+            # Use Python's f-string formatting to display the count
+            result = f"<b style='color:green'> That's correct! </b> The magic word has been entered {magic_word_count} times."
         else:
-            result = "<span style='color:red'> Try the magic word 'fred'</span>"
-
+            # On failure, still show the current count
+            result = f"<span style='color:red'> Try the magic word 'fred'. Total count: {magic_word_count}</span>"
     # HTML template with the dynamic result
     html_content = f"""
     <!DOCTYPE html>
